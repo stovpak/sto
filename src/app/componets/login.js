@@ -40,21 +40,25 @@ export const Login = () => {
 
   return (
     <div className="flex flex-col gap-2">
+      <p className="text-white mt-2">Email</p>
       <input
-        className="text-black	!mt-2"
+        className="text-black	mt-2"
         type="email"
         name="email"
+        placeholder="Email"
         value={emailValue}
         onChange={(event) => {setEmailValue(event.target.value)}}
       />
+      <p className="text-white mt-2">Пароль</p>
       <input
-        className="text-black !mt-2"
+        className="text-black mt-2"
         type="text"
         name="password"
+        placeholder="Пароль"
         value={passwordValue}
         onChange={(event) => {setPasswordValue(event.target.value)}}
       />
-      <button className="bg-lime-700	mt-2" type="submit" onClick={onSubmit}>Submit</button>
+      <button className="bg-lime-700	mt-2" type="submit" onClick={onSubmit}>Войти</button>
       {error && <p className="text-red-700">{error}</p>}
     </div>
   )
