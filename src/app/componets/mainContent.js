@@ -5,14 +5,16 @@ import {Login} from "@/app/componets/login";
 import {useState, useEffect} from "react";
 import axios from "axios";
 import {XANO_DB_URL} from "@/helpers/consts";
+import {resolveAbsoluteUrlWithPathname} from "next/dist/lib/metadata/resolvers/resolve-url";
 
 export const MainContent = () => {
   const cookies = useCookies();
-  const isLogged = cookies.get('token');
+  const token = cookies.get('token');
 
   const getCarsUrl = `${XANO_DB_URL}/car`;
   const createCarUrl = `${XANO_DB_URL}/car`;
   const createNoteUrl = `${XANO_DB_URL}/notes`
+  const authUrl = `${XANO_DB_URL}/auth/me`;
   const getCarNotesUrl = (id) => `${XANO_DB_URL}/car/notes/${id}`;
   const getCar = (number) => `${XANO_DB_URL}/car/search/${number}`;
 
@@ -21,6 +23,7 @@ export const MainContent = () => {
   const [carsList, setCarsList] = useState([]);
   const [carNotes, setCarNotes] = useState([]);
   const [selectedCarId, setSelectedCarId] = useState(null);
+  const [isLogged, setIsLogged] = useState(false);
   const [selectedCarNumber, setSelectedCarNumber] = useState(null);
   const [noteText, setNoteText] = useState(null);
   const [newCar, setNewCar] = useState(null);
@@ -77,8 +80,31 @@ export const MainContent = () => {
     }
   }
 
+  async function checkIsLogged (token) {
+    try {
+      const {data} = await axios.get(authUrl, {
+        headers: {
+          "Authorization": token
+        }
+      });
+
+      if (data) {
+        setIsLogged(true);
+        return;
+      }
+      cookies.remove('token');
+      setIsLogged(false);
+    } catch {
+      cookies.remove('token');
+      setIsLogged(false);
+    }
+  }
+
   useEffect(() => {
-    initialCarSync();
+    if (token) {
+      checkIsLogged(token);
+      initialCarSync();
+    }
   }, []);
 
   return (
